@@ -39,19 +39,19 @@ int threads_create(void *(*start_routine) (void *), void *arg)
     static bool initialized;
 
     if (! initialized) {
-	if (! init_queues()) {
-	    abort();
-	}
+        if (! init_queues()) {
+            abort();
+        }
 
-	if (! init_first_context()) {
-	    abort();
-	}
+        if (! init_first_context()) {
+            abort();
+        }
 
-	if (! init_profiling_timer()) {
-	    abort();
-	}
-	
-	initialized = true;
+        if (! init_profiling_timer()) {
+            abort();
+        }
+
+        initialized = true;
     }
 
     // Create a thread control block for the newly created thread.
@@ -59,17 +59,17 @@ int threads_create(void *(*start_routine) (void *), void *arg)
     TCB *new;
 
     if ((new = tcb_new()) == NULL) {
-	return -1;
+        return -1;
     }
 
     if (getcontext(&new->context) == -1) {
-	tcb_destroy(new);
-	return -1;
+        tcb_destroy(new);
+        return -1;
     }
 
     if (! malloc_stack(new)) {
-	tcb_destroy(new);
-	return -1;
+        tcb_destroy(new);
+        return -1;
     }
 
     makecontext(&new->context, handle_thread_start, 1, new->id);
@@ -80,8 +80,8 @@ int threads_create(void *(*start_routine) (void *), void *arg)
     // Enqueue the newly created stack
 
     if (queue_enqueue(ready, new) != 0) {
-	tcb_destroy(new);
-	return -1;
+        tcb_destroy(new);
+        return -1;
     }
 
     unblock_sigprof();
@@ -92,18 +92,18 @@ int threads_create(void *(*start_routine) (void *), void *arg)
 void threads_exit(void *result)
 {
     if (running == NULL) {
-	exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
 
     block_sigprof();
     running->return_value = result;
 
     if (queue_enqueue(completed, running) != 0) {
-	abort();
+        abort();
     }
 
     if ((running = queue_dequeue(ready)) == NULL) {
-	exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
 
     setcontext(&running->context);  // also unblocks SIGPROF
@@ -113,8 +113,8 @@ void threads_exit(void *result)
 int threads_join(int id, void **result)
 {
     if (id < 0) {
-	errno = EINVAL;
-	return -1;
+        errno = EINVAL;
+        return -1;
     }
 
     block_sigprof();
@@ -122,11 +122,11 @@ int threads_join(int id, void **result)
     unblock_sigprof();
 
     if (block == NULL) {
-	return 0;
+        return 0;
     } else {
-	*result = block->return_value;
-	tcb_destroy(block);
-	return id;
+        *result = block->return_value;
+        tcb_destroy(block);
+        return id;
     }
 }
 
@@ -134,12 +134,12 @@ int threads_join(int id, void **result)
 static bool init_queues(void)
 {
     if ((ready = queue_new()) == NULL) {
-	return false;
+        return false;
     }
 
     if ((completed = queue_new()) == NULL) {
-	queue_destroy(ready);
-	return false;
+        queue_destroy(ready);
+        return false;
     }
 
     return true;
@@ -150,12 +150,12 @@ static bool init_first_context(void)
     TCB *block;
 
     if ((block = tcb_new()) == NULL) {
-	return false;
+        return false;
     }
 
     if (getcontext(&block->context) == -1) {
-	tcb_destroy(block);
-	return false;
+        tcb_destroy(block);
+        return false;
     }
 
     running = block;
@@ -171,32 +171,32 @@ static bool init_profiling_timer(void)
     sigfillset(&all);
 
     const struct sigaction alarm = {
-	.sa_sigaction = handle_sigprof,
-	.sa_mask = all,
-	.sa_flags = SA_SIGINFO | SA_RESTART
+        .sa_sigaction = handle_sigprof,
+        .sa_mask = all,
+        .sa_flags = SA_SIGINFO | SA_RESTART
     };
 
     struct sigaction old;
 
     if (sigaction(SIGPROF, &alarm, &old) == -1) {
-	perror("sigaction");
-	abort();
+        perror("sigaction");
+        abort();
     }
 
     const struct itimerval timer = {
-	{ 0, 10000 },
-	{ 0, 1 }  // arms the timer as soon as possible
+        { 0, 10000 },
+        { 0, 1 }  // arms the timer as soon as possible
     };
 
     // Enable timer
 
     if (setitimer(ITIMER_PROF, &timer, NULL) == - 1) {
-	if (sigaction(SIGPROF, &old, NULL) == -1) {
-	    perror("sigaction");
-	    abort();
-	}
+        if (sigaction(SIGPROF, &old, NULL) == -1) {
+            perror("sigaction");
+            abort();
+        }
 
-	return false;
+        return false;
     }
 
     return true;
@@ -208,11 +208,11 @@ static void handle_sigprof(int signum, siginfo_t *nfo, void *context)
     int old_errno = errno;
 
     if (running == NULL && queue_size(ready) == 0) {
-	_exit(EXIT_SUCCESS);
+        _exit(EXIT_SUCCESS);
     }
 
     // Backup the current context
-    
+
     ucontext_t *stored = &running->context;
     ucontext_t *updated = (ucontext_t *) context;
 
@@ -224,18 +224,18 @@ static void handle_sigprof(int signum, siginfo_t *nfo, void *context)
     // Round robin
 
     if (queue_enqueue(ready, running) != 0) {
-	abort();
+        abort();
     }
 
     if ((running = queue_dequeue(ready)) == NULL) {
-	abort();
+        abort();
     }
 
     // Manually leave the signal handler
 
     errno = old_errno;
     if (setcontext(&running->context) == -1) {
-	abort();
+        abort();
     }
 }
 
@@ -250,7 +250,7 @@ static void handle_thread_start(void)
     threads_exit(result);
 }
 
-	 
+
 static bool malloc_stack(TCB *thread)
 {
     // Get the stack size
@@ -258,7 +258,7 @@ static bool malloc_stack(TCB *thread)
     struct rlimit limit;
 
     if (getrlimit(RLIMIT_STACK, &limit) == -1) {
-	return false;
+        return false;
     }
 
     // Allocate memory
@@ -266,7 +266,7 @@ static bool malloc_stack(TCB *thread)
     void *stack;
 
     if ((stack = malloc(limit.rlim_cur)) == NULL) {
-	return false;
+        return false;
     }
 
     // Update the thread control bock
@@ -287,8 +287,8 @@ static void block_sigprof(void)
     sigaddset(&sigprof, SIGPROF);
 
     if (sigprocmask(SIG_BLOCK, &sigprof, NULL) == -1) {
-	perror("sigprocmask");
-	abort();
+        perror("sigprocmask");
+        abort();
     }
 }
 
@@ -300,7 +300,7 @@ static void unblock_sigprof(void)
     sigaddset(&sigprof, SIGPROF);
 
     if (sigprocmask(SIG_UNBLOCK, &sigprof, NULL) == -1) {
-	perror("sigprocmask");
-	abort();
+        perror("sigprocmask");
+        abort();
     }
 }

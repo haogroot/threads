@@ -24,7 +24,7 @@ QUEUE *queue_new(void)
     QUEUE *new;
 
     if ((new = calloc(1, sizeof(QUEUE))) == NULL) {
-	return NULL;
+        return NULL;
     }
 
     return new;
@@ -37,11 +37,11 @@ void queue_destroy(QUEUE *queue)
     struct node *cursor = queue->head;
 
     while (cursor != NULL) {
-	prev = cursor;
-	cursor = cursor->next;
+        prev = cursor;
+        cursor = cursor->next;
 
-	tcb_destroy(prev->thread);
-	free(prev);
+        tcb_destroy(prev->thread);
+        free(prev);
     }
 
     free(queue);
@@ -61,7 +61,7 @@ int queue_enqueue(QUEUE *queue, TCB *elem)
     struct node *new;
 
     if ((new = malloc(sizeof(struct node))) == NULL) {
-	return errno;
+        return errno;
     }
 
     new->thread = elem;
@@ -70,13 +70,13 @@ int queue_enqueue(QUEUE *queue, TCB *elem)
     // Enqueue the new node
 
     if (queue->head == NULL) {
-	queue->head = new;
+        queue->head = new;
     } else {
-	struct node *parent = queue->head;
-	while (parent->next != NULL) {
-	    parent = parent->next;
-	}
-	parent->next = new;
+        struct node *parent = queue->head;
+        while (parent->next != NULL) {
+            parent = parent->next;
+        }
+        parent->next = new;
     }
 
     queue->size += 1;
@@ -100,27 +100,27 @@ TCB *queue_dequeue(QUEUE *queue)
 TCB *queue_remove_id(QUEUE *queue, int id)
 {
     if (queue->head == NULL) {
-	return NULL;
+        return NULL;
     }
 
     struct node *prev = NULL;
     struct node *cur = queue->head;
 
     while (cur != NULL) {
-	if (cur->thread->id == id) {
-	    if (prev == NULL) {
-		queue->head = cur->next;
-	    } else {
-		prev->next = cur->next;
-	    }
+        if (cur->thread->id == id) {
+            if (prev == NULL) {
+                queue->head = cur->next;
+            } else {
+                prev->next = cur->next;
+            }
 
-	    TCB *retval = cur->thread;
-	    free(cur);
-	    return retval;
-	}
+            TCB *retval = cur->thread;
+            free(cur);
+            return retval;
+        }
 
-	prev = cur;
-	cur = cur->next;
+        prev = cur;
+        cur = cur->next;
     }
 
     return NULL;

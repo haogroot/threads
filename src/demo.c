@@ -27,10 +27,10 @@ static void *thread0(void *arg)
 static void *thread1(void *arg)
 {
     if ((unsigned long) arg % 2 == 0) {
-	return arg;
+        return arg;
     } else {
-	for (;;) {
-	}
+        for (;;) {
+        }
     }
 }
 
@@ -62,24 +62,24 @@ int main(void)
     int threads[8];
 
     for (unsigned long i = 0; i < 8; ++i) {
-	void *arg = (void *) i;
+        void *arg = (void *) i;
 
-	if ((threads[i] = threads_create(thread1, arg)) == -1) {
-	    perror("threads_create");
-	    exit(EXIT_FAILURE);
-	}
+        if ((threads[i] = threads_create(thread1, arg)) == -1) {
+            perror("threads_create");
+            exit(EXIT_FAILURE);
+        }
     }
 
     for (int i = 0; i < 8; ++i) {
-	int id = threads[i];
+        int id = threads[i];
 
-	while (1) {
-	    void *res;
+        while (1) {
+            void *res;
 
-	    if (threads_join(id, &res) > 0) {
-		printf("joined thread %d with result %p\n", id, res);
-		break;
-	    }
-	}
+            if (threads_join(id, &res) > 0) {
+                printf("joined thread %d with result %p\n", id, res);
+                break;
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ TCB *tcb_new(void)
     TCB *new;
 
     if ((new = calloc(1, sizeof(TCB))) == NULL) {
-	return NULL;
+        return NULL;
     }
 
     new->id = next_id++;
@@ -21,7 +21,7 @@ TCB *tcb_new(void)
 void tcb_destroy(TCB *block)
 {
     if (block->has_dynamic_stack) {
-	free(block->context.uc_stack.ss_sp);
+        free(block->context.uc_stack.ss_sp);
     }
 
     free(block);
