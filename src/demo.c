@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 
-/*
 static void *magic = NULL;
 static unsigned count;
 
@@ -22,7 +21,6 @@ static void *thread0(void *arg)
 
     return NULL;
 }
-*/
 
 static void *thread1(void *arg)
 {
@@ -39,7 +37,6 @@ int main(void)
 {
     puts("Hello, this is main().");
 
-    /*
 
     for (unsigned long i = 0; i < 8; ++i) {
 	void *arg = (void *) i;
@@ -57,8 +54,7 @@ int main(void)
 	}
     }
     
-    */
-
+/*
     int threads[8];
 
     for (unsigned long i = 0; i < 8; ++i) {
@@ -70,7 +66,7 @@ int main(void)
         }
     }
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 4; ++i) {
         int id = threads[i];
 
         while (1) {
@@ -82,4 +78,5 @@ int main(void)
             }
         }
     }
+    */
 }
